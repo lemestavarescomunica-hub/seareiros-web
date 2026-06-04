@@ -21,11 +21,11 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
         </Transition.Child>
         <div className="fixed inset-0 overflow-y-auto flex min-h-full items-end sm:items-center justify-center p-4">
           <Transition.Child as={Fragment} enter="ease-out duration-200" enterFrom="opacity-0 translate-y-4 sm:scale-95" enterTo="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-150" leaveFrom="opacity-100 translate-y-0 sm:scale-100" leaveTo="opacity-0 translate-y-4 sm:scale-95">
-            <Dialog.Panel className={`w-full ${maxW} bg-surface rounded-card shadow-card-md p-6`}>
-              <div className="flex items-center justify-between mb-4">
-                <Dialog.Title className="text-lg font-bold text-text-primary">{title}</Dialog.Title>
-                <button onClick={onClose} className="p-1 rounded-lg hover:bg-primary-50 text-text-secondary hover:text-text-primary transition-colors">
-                  <X size={18} />
+            <Dialog.Panel className={`w-full ${maxW} bg-white rounded-2xl p-6`} style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
+              <div className="flex items-center justify-between mb-5">
+                <Dialog.Title className="text-lg font-bold text-[#3B2F2F]">{title}</Dialog.Title>
+                <button onClick={onClose} className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-[#7A6B6B] hover:bg-orange-100 hover:text-[#D4764E] transition-colors">
+                  <X size={16} />
                 </button>
               </div>
               {children}

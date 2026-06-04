@@ -4,15 +4,15 @@ import { BottomNav } from './BottomNav';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen" style={{ backgroundColor: '#FFF9F2' }}>
       {/* Sidebar — desktop */}
-      <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-60 flex-col bg-surface border-r border-border shadow-card z-40">
+      <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-60 flex-col bg-white border-r border-orange-100 z-40" style={{ boxShadow: '0 0 12px rgba(0,0,0,0.04)' }}>
         <Sidebar />
       </aside>
 
       {/* Conteúdo principal */}
-      <main className="lg:ml-60 pb-20 lg:pb-0 min-h-screen">
-        <div className="max-w-4xl mx-auto px-4 py-6">
+      <main className="lg:ml-60 pb-24 lg:pb-8 min-h-screen">
+        <div className="max-w-2xl mx-auto px-4 py-6">
           {children}
         </div>
       </main>

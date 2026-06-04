@@ -1,25 +1,39 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
+@theme {
   --color-primary: #D4764E;
+  --color-primary-dark: #B85A35;
+  --color-primary-light: #F0C4A8;
+  --color-secondary: #5B8C5A;
+  --color-secondary-dark: #3D6B3C;
+  --color-secondary-light: #A8D5A7;
+  --color-accent: #E8C547;
+  --color-accent-dark: #C9A825;
   --color-background: #FFF9F2;
+  --color-surface: #FFFFFF;
+  --color-border: #E8DDD5;
+  --color-text-primary: #3B2F2F;
+  --color-text-secondary: #7A6B6B;
+  --color-success: #2E7D32;
+  --color-warning: #F57F17;
+  --color-error: #C62828;
+  --font-family-sans: 'Nunito', system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; }
 
 body {
-  font-family: 'Nunito', system-ui, sans-serif;
   background-color: #FFF9F2;
   color: #3B2F2F;
+  font-family: 'Nunito', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #E8DDD5; border-radius: 3px; }
+a { color: inherit; text-decoration: none; }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: #E8DDD5; border-radius: 2px; }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
