@@ -49,6 +49,17 @@ export const authOptions: NextAuthOptions = {
       return session
     },
   },
+  cookies: {
+    sessionToken: {
+      name: 'seareiros-auth-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax' as const,
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
   pages: {
     signIn: '/login',
   },
