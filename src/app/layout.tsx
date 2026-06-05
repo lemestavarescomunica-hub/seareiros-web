@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import { Providers } from '@/providers';
+import { ServiceWorker } from '@/components/layout/ServiceWorker';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR" className="h-full">
       <body className="min-h-full bg-background font-sans text-text-primary">
         <Providers>
+          <ServiceWorker />
           {children}
           <Toaster
             position="top-center"

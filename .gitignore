@@ -42,8 +42,6 @@ next-env.d.ts
 
 /src/generated/prisma
 
-# PWA — gerado automaticamente no build
-/public/sw.js
-/public/sw.js.map
+# PWA workbox (se gerado automaticamente)
 /public/workbox-*.js
 /public/workbox-*.js.map
