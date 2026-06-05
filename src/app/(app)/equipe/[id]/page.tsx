@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import { useVoluntarioStore } from '@/stores/voluntarioStore';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card } from '@/components/ui/Card';
-import { Avatar } from '@/components/ui/Avatar';
+import { FotoUpload } from '@/components/ui/FotoUpload';
 import { abrirWhatsAppContato, ligarPara } from '@/lib/utils';
 import { MessageCircle, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -33,7 +33,15 @@ export default function VoluntarioDetailPage() {
         action={<button onClick={() => editando ? salvar() : setEditando(true)} className="px-4 py-2 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary-dark transition">{editando ? 'Salvar' : 'Editar'}</button>}
       />
       <Card className="p-6 flex flex-col items-center gap-3">
-        <Avatar nome={v.nome} size={72} />
+        <FotoUpload
+          fotoAtual={v.avatar_url || null}
+          userId={v.id}
+          tamanho={96}
+          onFotoAtualizada={url => {
+            updateVoluntario(id, { avatar_url: url });
+            toast.success('Foto atualizada!');
+          }}
+        />
         {!editando ? (
           <>
             <h2 className="text-xl font-bold text-text-primary">{v.nome}</h2>

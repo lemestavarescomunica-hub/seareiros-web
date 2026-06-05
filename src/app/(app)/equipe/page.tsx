@@ -54,7 +54,7 @@ export default function EquipePage() {
         <div className="space-y-3">
           {filtrados.map(v => (
             <div key={v.id} className="bg-white rounded-2xl border border-orange-100 p-4 flex items-center gap-3 shadow-sm">
-              <Link href={`/equipe/${v.id}`}><Avatar nome={v.nome} size={48} /></Link>
+              <Link href={`/equipe/${v.id}`}><Avatar nome={v.nome} size={48} fotoUrl={v.avatar_url} /></Link>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <Link href={`/equipe/${v.id}`}>
