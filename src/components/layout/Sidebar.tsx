@@ -1,8 +1,8 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, CookingPot, CalendarHeart, Users, ShoppingCart, Warehouse, Settings, Tag, LogOut } from 'lucide-react';
-import { useAuthStore } from '@/stores/authStore';
+import { Home, CookingPot, CalendarHeart, Users, ShoppingCart, Warehouse, Settings, Tag, LogOut, TrendingUp, Scale } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
 import { iniciais } from '@/lib/utils';
 
 const navItems = [
@@ -11,6 +11,8 @@ const navItems = [
   { href: '/eventos', label: 'Eventos', icon: CalendarHeart },
   { href: '/equipe', label: 'Equipe', icon: Users },
   { href: '/produtos', label: 'Produtos', icon: ShoppingCart },
+  { href: '/precos/evolucao', label: 'Evolução de Preços', icon: TrendingUp },
+  { href: '/cotacoes', label: 'Cotação de Preços', icon: Scale },
   { href: '/estoque', label: 'Estoque', icon: Warehouse },
   { href: '/vendas', label: 'Itens à Venda', icon: Tag },
   { href: '/configuracoes', label: 'Configurações', icon: Settings },
@@ -18,11 +20,11 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { user, logout } = useAuthStore();
+  const { data: session } = useSession();
   const router = useRouter();
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await signOut({ redirect: false });
     router.push('/login');
   }
 
@@ -63,15 +65,15 @@ export function Sidebar() {
       </nav>
 
       {/* Usuário */}
-      {user && (
+      {session?.user && (
         <div className="p-4 border-t border-orange-100">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-xs font-bold text-[#D4764E]">
-              {iniciais(user.nome)}
+              {iniciais(session.user.name || 'U')}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-[#3B2F2F] truncate">{user.nome}</p>
-              <p className="text-[10px] text-[#7A6B6B]">{user.role === 'admin' ? 'Administrador' : 'Leitor'}</p>
+              <p className="text-sm font-semibold text-[#3B2F2F] truncate">{session.user.name}</p>
+              <p className="text-[10px] text-[#7A6B6B]">{(session.user as any).role === 'ADMIN' ? 'Administrador' : 'Leitor'}</p>
             </div>
           </div>
           <button

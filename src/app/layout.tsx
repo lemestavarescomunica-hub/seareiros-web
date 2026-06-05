@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
+import { Providers } from '@/providers';
 
 export const metadata: Metadata = {
   title: 'Seareiros — Gestão da Cozinha',
@@ -15,6 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR" className="h-full">
       <body className="min-h-full bg-background font-sans text-text-primary">
+        <Providers>
         {children}
         <Toaster
           position="top-center"
@@ -24,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             error: { iconTheme: { primary: '#C62828', secondary: '#fff' } },
           }}
         />
+        </Providers>
       </body>
     </html>
   );

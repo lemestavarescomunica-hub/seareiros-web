@@ -146,20 +146,50 @@ export function gerarListaCompras(pratosDoEvento: EventoPrato[]): Omit<ItemLista
 }
 
 export function formatarListaWhatsApp(evento: Evento, itens: ItemLista[]): string {
-  let texto = `🍲 *LISTA DE COMPRAS*\n📋 ${evento.nome}\n📅 ${formatarData(evento.data_inicio)}\n👥 ${evento.publico_estimado} pessoas\n\n`;
-  let categoriaAtual = '';
-  let total = 0;
-  for (const item of itens) {
-    if (item.categoria !== categoriaAtual) {
-      categoriaAtual = item.categoria || '';
-      texto += `\n*${LABELS_CATEGORIA_PRODUTO[item.categoria as CategoriaProduto] || 'Outros'}:*\n`;
-    }
-    const nome = item.item_extra ? item.nome_extra : item.produto?.nome;
-    texto += `${item.comprado ? '✅' : '⬜'} ${nome} — ${item.quantidade} ${item.unidade}`;
-    if (item.preco_estimado) { texto += ` (~${formatarMoeda(item.preco_estimado)})`; total += item.preco_estimado; }
-    texto += '\n';
+  const emojisCategoria: Record<string, string> = {
+    carnes: '🥩', verduras_legumes: '🥬', graos: '🫘', temperos: '🧂',
+    laticinios: '🧀', descartaveis: '📦', limpeza: '🧹', bebidas: '🥤', outros: '📌',
+  };
+  const totalGeral = itens.reduce((sum, i) => sum + (i.preco_estimado || 0), 0);
+  const itensReceita = itens.filter(i => !i.item_extra);
+  const itensExtras = itens.filter(i => i.item_extra);
+
+  let texto = `🍲 *LISTA DE COMPRAS*\n`;
+  texto += `📋 ${evento.nome}\n`;
+  texto += `📅 ${formatarData(evento.data_inicio)} | 👥 ${evento.publico_estimado} pessoas\n`;
+  texto += `💰 Estimativa: ${formatarMoeda(totalGeral)}\n\n`;
+  texto += `━━━━━━━━━━━━━━━━━━\n`;
+
+  const categorias = new Map<string, ItemLista[]>();
+  for (const item of itensReceita) {
+    const cat = item.categoria || 'outros';
+    if (!categorias.has(cat)) categorias.set(cat, []);
+    categorias.get(cat)!.push(item);
   }
-  texto += `\n💰 *Total estimado: ${formatarMoeda(total)}*\n\n_Gerado pelo app Seareiros_ 🙏`;
+  for (const [cat, catItens] of categorias) {
+    const emoji = emojisCategoria[cat] || '📌';
+    const label = LABELS_CATEGORIA_PRODUTO[cat as CategoriaProduto] || cat.toUpperCase();
+    texto += `\n*${emoji} ${label.toUpperCase()}:*\n`;
+    for (const item of catItens) {
+      const check = item.comprado ? '✅' : '⬜';
+      texto += `${check} ${item.produto?.nome || item.nome_extra} — ${item.quantidade} ${item.unidade}`;
+      if (item.preco_estimado) texto += ` (~${formatarMoeda(item.preco_estimado)})`;
+      texto += '\n';
+    }
+  }
+  if (itensExtras.length > 0) {
+    texto += `\n*📌 EXTRAS:*\n`;
+    for (const item of itensExtras) {
+      const check = item.comprado ? '✅' : '⬜';
+      texto += `${check} ${item.nome_extra || item.produto?.nome} — ${item.quantidade} ${item.unidade}`;
+      if (item.preco_estimado) texto += ` (~${formatarMoeda(item.preco_estimado)})`;
+      texto += '\n';
+    }
+  }
+  texto += `\n━━━━━━━━━━━━━━━━━━\n`;
+  texto += `💰 *TOTAL ESTIMADO: ${formatarMoeda(totalGeral)}*\n\n`;
+  texto += `_Marque com ✅ conforme for comprando!_\n`;
+  texto += `_Gerado por Seareiros 🙏_`;
   return texto;
 }
 

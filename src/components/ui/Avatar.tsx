@@ -8,7 +8,17 @@ function corPorNome(nome: string) {
   return CORES[Math.abs(hash) % CORES.length];
 }
 
-export function Avatar({ nome, size = 40 }: { nome: string; size?: number }) {
+export function Avatar({ nome, size = 40, fotoUrl }: { nome: string; size?: number; fotoUrl?: string | null }) {
+  if (fotoUrl) {
+    return (
+      <img
+        src={fotoUrl}
+        alt={nome}
+        className="rounded-full object-cover shrink-0"
+        style={{ width: size, height: size, border: '2px solid #E8DDD5' }}
+      />
+    );
+  }
   const cor = corPorNome(nome);
   return (
     <div

@@ -1,0 +1,377 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== AUTH ====================
+
+model User {
+  id              String   @id @default(uuid())
+  nome            String
+  email           String   @unique
+  senha           String
+  telefone        String?
+  role            Role     @default(LEITOR)
+  ativo           Boolean  @default(true)
+  fotoUrl         String?  @map("foto_url")
+  disponibilidade Json?    @default("{}")
+  habilidades     String[] @default([])
+  restricoes      String?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  escalacoes EventoVoluntario[]
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN  @map("admin")
+  LEITOR @map("leitor")
+}
+
+// ==================== PRODUTOS ====================
+
+model Produto {
+  id            String           @id @default(uuid())
+  nome          String
+  categoria     CategoriaProduto
+  unidadeCompra String           @map("unidade_compra")
+  precoMedio    Decimal          @default(0) @map("preco_medio") @db.Decimal(10, 2)
+  fornecedor    String?
+  observacoes   String?
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+
+  historicoPrecos HistoricoPreco[]
+  ingredientes    ReceitaIngrediente[]
+  itensCompra     ListaComprasItem[]
+  estoque         Estoque[]
+  itensVenda      ItemVenda[]
+  cotacaoItens    CotacaoItem[]
+  estoqueLotes    EstoqueLote[]
+
+  @@map("produtos")
+}
+
+enum CategoriaProduto {
+  GRAOS            @map("graos")
+  CARNES           @map("carnes")
+  VERDURAS_LEGUMES @map("verduras_legumes")
+  TEMPEROS         @map("temperos")
+  LATICINIOS       @map("laticinios")
+  DESCARTAVEIS     @map("descartaveis")
+  LIMPEZA          @map("limpeza")
+  BEBIDAS          @map("bebidas")
+  OUTROS           @map("outros")
+}
+
+model HistoricoPreco {
+  id         String   @id @default(uuid())
+  produtoId  String   @map("produto_id")
+  preco      Decimal  @db.Decimal(10, 2)
+  data       DateTime @default(now())
+  eventoId   String?  @map("evento_id")
+  eventoNome String?  @map("evento_nome")
+  origem     String   @default("manual")
+
+  produto Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  evento  Evento? @relation(fields: [eventoId], references: [id])
+
+  @@map("historico_precos")
+}
+
+// ==================== RECEITAS ====================
+
+model Receita {
+  id                String           @id @default(uuid())
+  nome              String
+  categoria         CategoriaReceita
+  rendimentoBase    Int              @map("rendimento_base")
+  unidadeRendimento String           @default("porções") @map("unidade_rendimento")
+  modoPreparo       String?          @map("modo_preparo")
+  observacoes       String?
+  tempoPreparoMin   Int?             @map("tempo_preparo_minutos")
+  fotoUrl           String?          @map("foto_url")
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+
+  ingredientes ReceitaIngrediente[]
+  eventoPratos EventoPrato[]
+
+  @@map("receitas")
+}
+
+enum CategoriaReceita {
+  SOPA_SEMANAL         @map("sopa_semanal")
+  CALDOS               @map("caldos")
+  PRATO_PRINCIPAL      @map("prato_principal")
+  LANCHE               @map("lanche")
+  SOBREMESA            @map("sobremesa")
+  ALMOCO_TRABALHADORES @map("almoco_trabalhadores")
+  OUTROS               @map("outros")
+}
+
+model ReceitaIngrediente {
+  id            String  @id @default(uuid())
+  receitaId     String  @map("receita_id")
+  produtoId     String  @map("produto_id")
+  quantidade    Decimal @db.Decimal(10, 3)
+  unidadeMedida String  @map("unidade_medida")
+  observacao    String?
+
+  receita Receita @relation(fields: [receitaId], references: [id], onDelete: Cascade)
+  produto Produto @relation(fields: [produtoId], references: [id])
+
+  @@map("receita_ingredientes")
+}
+
+// ==================== EVENTOS ====================
+
+model Evento {
+  id              String       @id @default(uuid())
+  nome            String
+  dataInicio      DateTime     @map("data_inicio") @db.Date
+  dataFim         DateTime?    @map("data_fim") @db.Date
+  horarioInicio   String?      @map("horario_inicio")
+  horarioFim      String?      @map("horario_fim")
+  publicoEstimado Int          @map("publico_estimado")
+  status          StatusEvento @default(PLANEJAMENTO)
+  recorrente      Boolean      @default(false)
+  tipoRecorrencia String?      @map("tipo_recorrencia")
+  observacoes     String?
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  pratos          EventoPrato[]
+  listasCompras   ListaCompras[]
+  voluntarios     EventoVoluntario[]
+  historicoPrecos HistoricoPreco[]
+  itensVenda      ItemVenda[]
+  cotacoes        Cotacao[]
+
+  @@map("eventos")
+}
+
+enum StatusEvento {
+  PLANEJAMENTO @map("planejamento")
+  COMPRAS      @map("compras")
+  EM_EXECUCAO  @map("em_execucao")
+  CONCLUIDO    @map("concluido")
+}
+
+model EventoPrato {
+  id                String @id @default(uuid())
+  eventoId          String @map("evento_id")
+  receitaId         String @map("receita_id")
+  quantidadePorcoes Int    @map("quantidade_porcoes")
+
+  evento  Evento  @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  receita Receita @relation(fields: [receitaId], references: [id])
+
+  @@map("evento_pratos")
+}
+
+// ==================== LISTA DE COMPRAS ====================
+
+model ListaCompras {
+  id          String   @id @default(uuid())
+  eventoId    String   @map("evento_id")
+  geradaEm    DateTime @default(now()) @map("gerada_em")
+  observacoes String?
+
+  evento Evento             @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  itens  ListaComprasItem[]
+
+  @@map("lista_compras")
+}
+
+model ListaComprasItem {
+  id            String   @id @default(uuid())
+  listaId       String   @map("lista_id")
+  produtoId     String?  @map("produto_id")
+  quantidade    Decimal  @db.Decimal(10, 3)
+  unidade       String
+  precoEstimado Decimal? @map("preco_estimado") @db.Decimal(10, 2)
+  comprado      Boolean  @default(false)
+  localCompra   String?  @map("local_compra")
+  itemExtra     Boolean  @default(false) @map("item_extra")
+  nomeExtra     String?  @map("nome_extra")
+  categoria     String?
+
+  lista   ListaCompras @relation(fields: [listaId], references: [id], onDelete: Cascade)
+  produto Produto?     @relation(fields: [produtoId], references: [id])
+
+  @@map("lista_compras_itens")
+}
+
+// ==================== VOLUNTÁRIOS ====================
+
+model EventoVoluntario {
+  id                String           @id @default(uuid())
+  eventoId          String           @map("evento_id")
+  voluntarioId      String           @map("voluntario_id")
+  turno             Turno
+  funcao            String?
+  statusConfirmacao StatusConfirmacao @default(PENDENTE) @map("status_confirmacao")
+  createdAt         DateTime         @default(now()) @map("created_at")
+
+  evento     Evento @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  voluntario User   @relation(fields: [voluntarioId], references: [id])
+
+  @@map("evento_voluntarios")
+}
+
+enum Turno {
+  MANHA   @map("manha")
+  TARDE   @map("tarde")
+  NOITE   @map("noite")
+  LIMPEZA @map("limpeza")
+}
+
+enum StatusConfirmacao {
+  PENDENTE   @map("pendente")
+  CONFIRMADO @map("confirmado")
+  RECUSADO   @map("recusado")
+}
+
+// ==================== ESTOQUE ====================
+
+model Estoque {
+  id               String      @id @default(uuid())
+  produtoId        String      @map("produto_id")
+  tipo             TipoEstoque
+  quantidadeAtual  Decimal     @default(0) @map("quantidade_atual") @db.Decimal(10, 3)
+  quantidadeMinima Decimal     @default(0) @map("quantidade_minima") @db.Decimal(10, 3)
+  unidade          String
+  updatedAt        DateTime    @updatedAt @map("updated_at")
+
+  produto       Produto               @relation(fields: [produtoId], references: [id])
+  movimentacoes EstoqueMovimentacao[]
+  lotes         EstoqueLote[]
+
+  @@map("estoque")
+}
+
+enum TipoEstoque {
+  SOPA_SEMANAL @map("sopa_semanal")
+  LIMPEZA      @map("limpeza")
+}
+
+model EstoqueMovimentacao {
+  id            String   @id @default(uuid())
+  estoqueId     String   @map("estoque_id")
+  tipoMovimento String   @map("tipo_movimento")
+  quantidade    Decimal  @db.Decimal(10, 3)
+  motivo        String?
+  data          DateTime @default(now())
+
+  estoque Estoque @relation(fields: [estoqueId], references: [id], onDelete: Cascade)
+
+  @@map("estoque_movimentacoes")
+}
+
+model EstoqueLote {
+  id              String   @id @default(uuid())
+  estoqueId       String   @map("estoque_id")
+  produtoId       String   @map("produto_id")
+  quantidade      Decimal  @db.Decimal(10, 3)
+  unidade         String
+  dataValidade    DateTime @map("data_validade") @db.Date
+  alertaDiasAntes Int      @default(7) @map("alerta_dias_antes")
+  status          String   @default("ok")
+  destino         String?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  estoque Estoque @relation(fields: [estoqueId], references: [id], onDelete: Cascade)
+  produto Produto @relation(fields: [produtoId], references: [id])
+
+  @@map("estoque_lotes")
+}
+
+// ==================== VENDAS ====================
+
+model ItemVenda {
+  id                   String   @id @default(uuid())
+  produtoId            String?  @map("produto_id")
+  eventoId             String   @map("evento_id")
+  nomePersonalizado    String?  @map("nome_personalizado")
+  quantidadeDisponivel Decimal  @map("quantidade_disponivel") @db.Decimal(10, 3)
+  unidade              String
+  precoCusto           Decimal  @map("preco_custo") @db.Decimal(10, 2)
+  margemPercentual     Decimal  @default(10) @map("margem_percentual") @db.Decimal(5, 2)
+  precoVenda           Decimal  @map("preco_venda") @db.Decimal(10, 2)
+  quantidadeVendida    Decimal  @default(0) @map("quantidade_vendida") @db.Decimal(10, 3)
+  receitaTotal         Decimal  @default(0) @map("receita_total") @db.Decimal(10, 2)
+  status               String   @default("disponivel")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  produto Produto? @relation(fields: [produtoId], references: [id])
+  evento  Evento   @relation(fields: [eventoId], references: [id])
+
+  @@map("itens_venda")
+}
+
+// ==================== COTAÇÕES ====================
+
+model Cotacao {
+  id         String   @id @default(uuid())
+  nome       String
+  eventoId   String?  @map("evento_id")
+  eventoNome String?  @map("evento_nome")
+  status     String   @default("em_andamento")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  evento       Evento?             @relation(fields: [eventoId], references: [id])
+  fornecedores CotacaoFornecedor[]
+  itens        CotacaoItem[]
+
+  @@map("cotacoes")
+}
+
+model CotacaoFornecedor {
+  id          String  @id @default(uuid())
+  cotacaoId   String  @map("cotacao_id")
+  nome        String
+  observacoes String?
+
+  cotacao Cotacao        @relation(fields: [cotacaoId], references: [id], onDelete: Cascade)
+  precos  CotacaoPreco[]
+
+  @@map("cotacao_fornecedores")
+}
+
+model CotacaoItem {
+  id          String  @id @default(uuid())
+  cotacaoId   String  @map("cotacao_id")
+  produtoId   String? @map("produto_id")
+  nomeProduto String  @map("nome_produto")
+  quantidade  Decimal @db.Decimal(10, 3)
+  unidade     String
+
+  cotacao Cotacao      @relation(fields: [cotacaoId], references: [id], onDelete: Cascade)
+  produto Produto?     @relation(fields: [produtoId], references: [id])
+  precos  CotacaoPreco[]
+
+  @@map("cotacao_itens")
+}
+
+model CotacaoPreco {
+  id            String   @id @default(uuid())
+  cotacaoItemId String   @map("cotacao_item_id")
+  fornecedorId  String   @map("fornecedor_id")
+  precoUnitario Decimal? @map("preco_unitario") @db.Decimal(10, 2)
+  melhorPreco   Boolean  @default(false) @map("melhor_preco")
+
+  item       CotacaoItem       @relation(fields: [cotacaoItemId], references: [id], onDelete: Cascade)
+  fornecedor CotacaoFornecedor @relation(fields: [fornecedorId], references: [id], onDelete: Cascade)
+
+  @@map("cotacao_precos")
+}

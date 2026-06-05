@@ -44,6 +44,47 @@ export interface HistoricoPreco {
   produto_id: string;
   preco: number;
   data: string;
+  evento_id?: string;
+  evento_nome?: string;
+  origem?: 'manual' | 'lista_compras' | 'cotacao' | 'atualizacao_lote';
+}
+
+export interface Cotacao {
+  id: string;
+  nome: string;
+  lista_compras_id?: string;
+  evento_id?: string;
+  evento_nome?: string;
+  status: 'em_andamento' | 'concluida';
+  fornecedores: CotacaoFornecedor[];
+  itens: CotacaoItem[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CotacaoFornecedor {
+  id: string;
+  cotacao_id: string;
+  nome: string;
+  observacoes?: string;
+}
+
+export interface CotacaoItem {
+  id: string;
+  cotacao_id: string;
+  produto_id?: string;
+  nome_produto: string;
+  quantidade: number;
+  unidade: string;
+  precos: CotacaoPreco[];
+}
+
+export interface CotacaoPreco {
+  id: string;
+  cotacao_item_id: string;
+  fornecedor_id: string;
+  preco_unitario?: number;
+  melhor_preco: boolean;
 }
 
 // Receitas

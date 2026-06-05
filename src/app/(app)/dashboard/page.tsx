@@ -3,13 +3,13 @@ import Link from 'next/link';
 import { CookingPot, CalendarPlus, ClipboardList, Users, AlertCircle, AlertTriangle, ChevronRight, Bell, Calendar, CalendarHeart } from 'lucide-react';
 import { useEventoStore } from '@/stores/eventoStore';
 import { useEstoqueStore } from '@/stores/estoqueStore';
-import { useAuthStore } from '@/stores/authStore';
+import { useSession } from 'next-auth/react';
 import { contarDias, formatarData, formatarMoeda, LABELS_STATUS_EVENTO, CORES_STATUS_EVENTO, calcularCustoReceita, verificarValidade, textoValidade } from '@/lib/utils';
 
 export default function DashboardPage() {
   const { eventos } = useEventoStore();
   const { getAlertas, getLotesComAlerta } = useEstoqueStore();
-  const { user } = useAuthStore();
+  const { data: session } = useSession();
 
   const hoje = new Date().toISOString().split('T')[0];
   const proxEvento = eventos
@@ -33,7 +33,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#3B2F2F]">Olá, {user?.nome?.split(' ')[0]} 🙏</h1>
+          <h1 className="text-2xl font-bold text-[#3B2F2F]">Olá, {session?.user?.name?.split(' ')[0]} 🙏</h1>
           <p className="text-sm text-[#7A6B6B]">Seareiros do Bem — Aparecida de Goiânia/GO</p>
         </div>
         <button className="w-10 h-10 rounded-full bg-white border border-orange-100 flex items-center justify-center" style={{ boxShadow: '0 2px 8px rgba(59,47,47,0.08)' }}>

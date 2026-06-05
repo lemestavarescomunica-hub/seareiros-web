@@ -21,10 +21,10 @@ export default function NovoEventoPage() {
 
   const inputCls = "w-full px-3 py-2.5 border border-border rounded-xl text-sm text-text-primary bg-background focus:ring-2 focus:ring-primary outline-none";
 
-  function salvar() {
+  async function salvar() {
     if (!nome.trim()) { toast.error('Informe o nome do evento.'); return; }
     if (!data) { toast.error('Informe a data do evento.'); return; }
-    const evento = addEvento({ nome: nome.trim(), data_inicio: data, horario_inicio: horI || undefined, horario_fim: horF || undefined, publico_estimado: parseInt(publico) || 100, status: 'planejamento' as StatusEvento, recorrente, tipo_recorrencia: recorrente ? tipoRec : undefined, observacoes: obs.trim() || undefined, pratos: [] });
+    const evento = await addEvento({ nome: nome.trim(), data_inicio: data, horario_inicio: horI || undefined, horario_fim: horF || undefined, publico_estimado: parseInt(publico) || 100, status: 'planejamento' as StatusEvento, recorrente, tipo_recorrencia: recorrente ? tipoRec : undefined, observacoes: obs.trim() || undefined, pratos: [] });
     toast.success('Evento criado!');
     router.push(`/eventos/${evento.id}`);
   }

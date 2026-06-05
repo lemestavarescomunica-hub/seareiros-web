@@ -1,7 +1,7 @@
 'use client';
 import { useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Minus, Plus, Clock, Users, Share2, Trash2, Lightbulb } from 'lucide-react';
+import { Minus, Plus, Clock, Users, Share2, Trash2, Lightbulb, Pencil } from 'lucide-react';
 import { useReceitaStore } from '@/stores/receitaStore';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -50,6 +50,10 @@ export default function ReceitaDetailPage() {
         backHref="/receitas"
         action={
           <div className="flex gap-2">
+            <button onClick={() => router.push(`/receitas/${id}/editar`)}
+              className="w-9 h-9 rounded-xl bg-white border border-[#E8DDD5] shadow-sm flex items-center justify-center text-[#7A6B6B] hover:bg-orange-50 hover:text-[#D4764E] transition-colors">
+              <Pencil size={16} />
+            </button>
             <button onClick={() => abrirWhatsApp(`🍲 *${receita.nome}*\n\n*Ingredientes para ${porcoes} ${receita.unidade_rendimento}:*\n` + ingredientes.map(i => `• ${i.produto?.nome}: ${i.quantidadeEscalada} ${i.unidade_medida}`).join('\n') + `\n\n_Gerado pelo app Seareiros_ 🙏`)}
               className="w-9 h-9 rounded-xl bg-white border border-[#E8DDD5] shadow-sm flex items-center justify-center text-[#5B8C5A] hover:bg-green-50 transition-colors">
               <Share2 size={16} />
