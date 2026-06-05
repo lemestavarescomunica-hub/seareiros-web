@@ -1,8 +1,28 @@
 'use client';
+import { useEffect } from 'react';
 import { Sidebar } from './Sidebar';
 import { BottomNav } from './BottomNav';
+import { useReceitaStore } from '@/stores/receitaStore';
+import { useProdutoStore } from '@/stores/produtoStore';
+import { useEventoStore } from '@/stores/eventoStore';
+import { useVoluntarioStore } from '@/stores/voluntarioStore';
+import { useEstoqueStore } from '@/stores/estoqueStore';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
+  const fetchReceitas   = useReceitaStore(s => s.fetchReceitas);
+  const fetchProdutos   = useProdutoStore(s => s.fetchProdutos);
+  const fetchEventos    = useEventoStore(s => s.fetchEventos);
+  const fetchVoluntarios = useVoluntarioStore(s => s.fetchVoluntarios);
+  const fetchEstoque    = useEstoqueStore(s => s.fetchEstoque);
+
+  useEffect(() => {
+    fetchReceitas();
+    fetchProdutos();
+    fetchEventos();
+    fetchVoluntarios();
+    fetchEstoque();
+  }, [fetchReceitas, fetchProdutos, fetchEventos, fetchVoluntarios, fetchEstoque]);
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#FFF9F2' }}>
       {/* Sidebar — desktop */}
