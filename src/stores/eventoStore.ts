@@ -2,7 +2,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Evento, EventoPrato, ListaCompras, ItemLista } from '../types';
-import { MOCK_EVENTOS } from '../lib/mockData';
 import { gerarId, agora, gerarListaCompras } from '../lib/utils';
 
 interface EventoState {
@@ -26,7 +25,7 @@ interface EventoState {
 export const useEventoStore = create<EventoState>()(
   persist(
     (set, get) => ({
-      eventos: MOCK_EVENTOS, listas: [],
+      eventos: [], listas: [],
       fetchEventos: async () => {
         try {
           const res = await fetch('/api/eventos');
@@ -147,6 +146,6 @@ export const useEventoStore = create<EventoState>()(
         }
       },
     }),
-    { name: 'seareiros-eventos', storage: createJSONStorage(() => localStorage) }
+    { name: 'seareiros-eventos', version: 2, storage: createJSONStorage(() => localStorage) }
   )
 );

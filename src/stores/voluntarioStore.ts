@@ -2,7 +2,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Profile, EventoVoluntario } from '../types';
-import { MOCK_VOLUNTARIOS } from '../lib/mockData';
 import { gerarId, agora } from '../lib/utils';
 
 interface VoluntarioState {
@@ -20,7 +19,7 @@ interface VoluntarioState {
 export const useVoluntarioStore = create<VoluntarioState>()(
   persist(
     (set, get) => ({
-      voluntarios: MOCK_VOLUNTARIOS, escalas: [],
+      voluntarios: [], escalas: [],
       fetchVoluntarios: async () => {
         try {
           const res = await fetch('/api/usuarios');
@@ -81,6 +80,6 @@ export const useVoluntarioStore = create<VoluntarioState>()(
         }
       },
     }),
-    { name: 'seareiros-voluntarios', storage: createJSONStorage(() => localStorage) }
+    { name: 'seareiros-voluntarios', version: 2, storage: createJSONStorage(() => localStorage) }
   )
 );

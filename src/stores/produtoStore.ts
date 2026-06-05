@@ -2,7 +2,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Produto } from '../types';
-import { MOCK_PRODUTOS } from '../lib/mockData';
 import { gerarId, agora } from '../lib/utils';
 
 interface ProdutoState {
@@ -17,7 +16,7 @@ interface ProdutoState {
 export const useProdutoStore = create<ProdutoState>()(
   persist(
     (set, get) => ({
-      produtos: MOCK_PRODUTOS,
+      produtos: [],
       fetchProdutos: async () => {
         try {
           const res = await fetch('/api/produtos');
@@ -54,6 +53,6 @@ export const useProdutoStore = create<ProdutoState>()(
       },
       getProduto: (id) => get().produtos.find(p => p.id === id),
     }),
-    { name: 'seareiros-produtos', storage: createJSONStorage(() => localStorage) }
+    { name: 'seareiros-produtos', version: 2, storage: createJSONStorage(() => localStorage) }
   )
 );

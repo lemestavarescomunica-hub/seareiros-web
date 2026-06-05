@@ -2,7 +2,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { EstoqueItem, EstoqueMovimentacao, EstoqueLote, StatusLote } from '../types';
-import { MOCK_ESTOQUE } from '../lib/mockData';
 import { gerarId, agora, verificarValidade } from '../lib/utils';
 
 interface EstoqueState {
@@ -22,7 +21,7 @@ interface EstoqueState {
 export const useEstoqueStore = create<EstoqueState>()(
   persist(
     (set, get) => ({
-      itens: MOCK_ESTOQUE, movimentacoes: [], lotes: [],
+      itens: [], movimentacoes: [], lotes: [],
       fetchEstoque: async () => {
         try {
           const res = await fetch('/api/estoque');
@@ -87,6 +86,6 @@ export const useEstoqueStore = create<EstoqueState>()(
           return verificarValidade(l.data_validade, l.alerta_dias_antes).status !== 'ok';
         }).sort((a, b) => a.data_validade.localeCompare(b.data_validade)),
     }),
-    { name: 'seareiros-estoque', storage: createJSONStorage(() => localStorage) }
+    { name: 'seareiros-estoque', version: 2, storage: createJSONStorage(() => localStorage) }
   )
 );

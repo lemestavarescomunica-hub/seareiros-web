@@ -2,7 +2,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Receita, ReceitaIngrediente } from '../types';
-import { MOCK_RECEITAS } from '../lib/mockData';
 import { gerarId, agora } from '../lib/utils';
 
 interface ReceitaState {
@@ -19,7 +18,7 @@ interface ReceitaState {
 export const useReceitaStore = create<ReceitaState>()(
   persist(
     (set, get) => ({
-      receitas: MOCK_RECEITAS,
+      receitas: [],
       fetchReceitas: async () => {
         try {
           const res = await fetch('/api/receitas');
@@ -81,6 +80,6 @@ export const useReceitaStore = create<ReceitaState>()(
         }
       },
     }),
-    { name: 'seareiros-receitas', storage: createJSONStorage(() => localStorage) }
+    { name: 'seareiros-receitas', version: 2, storage: createJSONStorage(() => localStorage) }
   )
 );
