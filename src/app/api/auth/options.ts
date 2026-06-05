@@ -23,12 +23,12 @@ export const authOptions: NextAuthOptions = {
         const senhaCorreta = await bcrypt.compare(credentials.senha, user.senha)
         if (!senhaCorreta) return null
 
+        // NUNCA colocar fotoUrl no JWT — Base64 enorme estoura o cookie (494)
         return {
           id: user.id,
           name: user.nome,
           email: user.email,
           role: user.role,
-          image: user.fotoUrl,
         } as any
       },
     }),
